@@ -68,46 +68,85 @@ export default class Home extends Component {
     reader.readAsDataURL(input.files[0]);
   }
 
-  renderIngredientPreview(name, src, stateKey) {
+  renderBeforePreview() {
+    const { beforeSrc } = this.state;
+
     let content;
-    if (src) {
-      content = <img className={styles.image_preview} src={src} alt={name} />;
+    if (beforeSrc) {
+      content = <img className={styles.image_preview} src={beforeSrc} alt="before" />;
     } else {
-      content = (
-        <input
-          type="file"
-          accept="image/png, image/jpeg"
-          onChange={(e) => this.onFileSelect(e, stateKey)}
-        />
-      );
+      content = <span className={styles.file_label} />;
     }
 
+    const text = beforeSrc ? 'Before' : 'Choose before image';
+
     return (
-      <div className={styles.image_cell}>{content}</div>
+      <label className={`${styles.image_cell} ${styles['image_cell--before']}`} htmlFor="input-before">
+        <span className={styles.file_label}>{text}</span>
+        {content}
+        <input
+          id="input-before"
+          className={styles.file_input}
+          type="file"
+          accept="image/png, image/jpeg"
+          onChange={(e) => this.onFileSelect(e, 'beforeSrc')}
+        />
+      </label>
+    );
+  }
+
+  renderAfterPreview() {
+    const { afterSrc } = this.state;
+
+    let content;
+    if (afterSrc) {
+      content = <img className={styles.image_preview} src={afterSrc} alt="after" />;
+    } else {
+      content = <span className={styles.file_label} />;
+    }
+
+    const text = afterSrc ? 'After' : 'Choose after image';
+
+    return (
+      <label className={`${styles.image_cell} ${styles['image_cell--after']}`} htmlFor="input-after">
+        {content}
+        <span className={styles.file_label}>{text}</span>
+        <input
+          id="input-after"
+          className={styles.file_input}
+          type="file"
+          accept="image/png, image/jpeg"
+          onChange={(e) => this.onFileSelect(e, 'afterSrc')}
+        />
+      </label>
     );
   }
 
   renderFinalPreview() {
     const { beforeAfterPath } = this.state;
 
-    return (
-      <div className={styles.image_cell}>
+    let content;
+    if (beforeAfterPath) {
+      content = (
         <a className={styles.image_preview_container} href={beforeAfterPath} download>
-          {beforeAfterPath &&
-            <img className={styles.image_preview} src={beforeAfterPath} alt="final" />}
+          <img className={styles.image_preview} src={beforeAfterPath} alt="final" />
         </a>
-      </div>
-    );
+      );
+    } else {
+      content = (
+        <span className={styles.file_label}>Preview</span>
+      );
+    }
+
+    return <div className={styles.image_cell}>{content}</div>;
   }
 
   render() {
-    const { beforeSrc, afterSrc } = this.state;
-
     return (
       <div className={styles.container}>
         <div className={styles.row}>
-          {this.renderIngredientPreview('before', beforeSrc, 'beforeSrc')}
-          {this.renderIngredientPreview('after', afterSrc, 'afterSrc')}
+          {this.renderBeforePreview()}
+          {this.renderAfterPreview()}
         </div>
         <div className={styles.row}>
           {this.renderFinalPreview()}
