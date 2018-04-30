@@ -3,6 +3,12 @@ import styles from './Home.css';
 
 const fs = require('fs');
 const process = require('child_process');
+const path = require('path');
+
+const ROOT_DIR = path.resolve('./');
+const SAVED_DIR = `${ROOT_DIR}/saved`;
+const TEMP_DIR = `${ROOT_DIR}/tmp`;
+const BIN_DIR = `${ROOT_DIR}/bin`;
 
 function decodeBase64Image(dataString) {
   const matches = dataString.match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
@@ -16,9 +22,9 @@ function decodeBase64Image(dataString) {
 
 function getIngredientImage(name, base64Image) {
   const decoded = decodeBase64Image(base64Image);
-  const path = `${__dirname}/../tmp/${name}.png`;
-  fs.writeFileSync(path, decoded.data, { encoding: 'base64' });
-  return path;
+  const imagePath = `${TEMP_DIR}/${name}.png`;
+  fs.writeFileSync(imagePath, decoded.data, { encoding: 'base64' });
+  return imagePath;
 }
 
 function getOutputImage(beforeSrc, afterSrc) {
@@ -27,13 +33,13 @@ function getOutputImage(beforeSrc, afterSrc) {
   const output = `before_and_after-${Date.now()}`;
 
   // Generate the before & after image
-  process.execSync(`./bin/beforeafterify.sh -b ${beforePath} -a ${afterPath} -o ./saved/${output}`);
+  process.execSync(`${BIN_DIR}/beforeafterify.sh -b ${beforePath} -a ${afterPath} -o ${SAVED_DIR}/${output}`);
 
   // Remove the temporary images
   process.execSync(`rm ${beforePath}`);
   process.execSync(`rm ${afterPath}`);
 
-  return `${__dirname}/../saved/${output}.gif`;
+  return `${SAVED_DIR}/${output}.gif`;
 }
 
 export default class Home extends Component {
